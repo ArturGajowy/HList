@@ -33,7 +33,7 @@ import Data.Typeable
 #endif
 
 #if __GLASGOW_HASKELL__ < 709
-import Data.Monoid
+import Data.Monoid (Monoid(..))
 #endif
 
 
