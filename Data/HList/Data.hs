@@ -100,7 +100,9 @@ deriving instance
 -- | this data type only exists to have Data instance
 newtype HListFlat a = HListFlat (HList a)
 
-type DataHListFlatCxt na g a = (HBuild' '[] g,
+type DataHListFlatCxt na g a = (
+        g ~ FoldRArrow a (HList a),
+        HBuild' '[] g,
         Typeable (HListFlat a),
         TypeablePolyK a,
         HFoldl (GfoldlK  C) (C g) a (C (HList a)),
@@ -112,8 +114,22 @@ type DataHListFlatCxt na g a = (HBuild' '[] g,
             (C (HList a)),
 
         HLengthEq a na,
-        HReplicate na ()
-        )
+        HReplicate na ())
+
+
+-- | ghc-8.0.2 can't work out the type g,
+-- in the 2nd argument of gfoldl. ghc <= 7.10
+-- don't need it.
+--
+-- in `instance Data (HListFlat '[a,b,c])`
+--
+-- > g ~ (a -> b -> c -> HList '[a,b,c])
+-- > g ~ GetG '[a,b,c] (HList '[a,b,c])
+type family FoldRArrow (xs :: [*]) (r :: *)
+
+type instance FoldRArrow '[] r = r
+type instance FoldRArrow (x ': xs) r = x -> FoldRArrow xs r 
+
 
 instance DataHListFlatCxt na g a => Data (HListFlat a) where
     gfoldl k z (HListFlat xs) = c3 $
