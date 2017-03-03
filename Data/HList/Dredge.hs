@@ -169,7 +169,7 @@ class LabelPathEndingWith (r :: *) (l :: k) (path :: [*]) | r l -> path where
 instance
    (FieldTree r ns,
     FilterLastEq (Label l) ns ns ns',
-    HSingleton (NonUnique r v l) (NamesDontMatch r ns l) ns' path)
+    HSingleton (NonUnique' r l) (NamesDontMatch r ns l) ns' path)
     => LabelPathEndingWith r l path
 
 
@@ -195,8 +195,10 @@ type NamesDontMatch r ns l = ErrShowType r
   :$$: ErrText "has paths"  :<>: ErrShowType ns
   :$$: ErrText "but none which end in the desired label" :<>: ErrShowType l
 
-type NonUnique r v l = ErrText "Path ending in label " :<>: ErrShowType l
+type NonUnique' r l = ErrText "Path ending in label " :<>: ErrShowType l
   :$$: ErrText "is not unique in " :<>: ErrShowType r
+
+type NonUnique r v l = NonUnique' r l
   :$$: ErrText "also considering the v type " :<>: ErrShowType v
 
 {- | XXX
