@@ -5,15 +5,20 @@
 {-# LANGUAGE EmptyDataDecls #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-module Main where
+module HListExample.MainPosting051106 where
 
 -- Needed for a reply to the Haskell mailing list
 
 import Data.HList.CommonMain hiding (Comp(..))
+import Properties.Common
+import Test.Hspec
 
-main = do
-    print $ comp "abc"
-    print $ (hComposeList test2 "abc" :: Int) -- definition in HList now
+mainPosting051106 = describe "hComposeList (a -> H[a -> b,b -> c,c -> d] -> d)" $ do
+    it "defined here" $
+        comp "abc" `shouldShowTo` "8"
+
+    it "defined in HList" $
+        hComposeList test2 "abc" `shouldShowTo` "8"
 
 test = HCons (length::String -> Int) (HCons ((+1)::(Int->Int)) (HCons ((*2)::(Int->Int)) HNil))
 test2 = length .*. (+1) .*. (*2) .*. HNil
@@ -28,6 +33,7 @@ instance Apply Comp (x -> y,y -> z)
   apply _ (f,g) = g . f
   -}
 
+-- `~` is (built-in) TypeCast mentioned below
 instance ((x -> y,y -> z) ~ xyz, (x -> z) ~ xz)
     => ApplyAB Comp xyz xz
  where

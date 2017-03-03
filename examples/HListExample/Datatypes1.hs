@@ -1,4 +1,4 @@
-module Datatypes1 where
+module HListExample.Datatypes1 where
 
 -- The fout-n-mouth example
 

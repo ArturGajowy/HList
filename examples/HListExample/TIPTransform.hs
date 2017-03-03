@@ -20,10 +20,13 @@
 -- http://www.haskell.org/pipermail/haskell-cafe/2009-September/066217.html
 -- The problem is an interesting variation of the keyword argument problem.
 
-module TIPTransform where
+module HListExample.TIPTransform where
 
-import Data.HList
+import Data.HList.CommonMain
 import Data.Typeable
+
+import Properties.Common
+import Test.Hspec
 
 -- We start with the examples
 
@@ -32,36 +35,36 @@ newtype MyVal = MyVal Int deriving (Show, Typeable)
 -- or if no typeable, use
 -- instance ShowLabel MyVal where showLabel _ = "MyVal"
 
--- A sample TIP
 tip1 = MyVal 20 .*. (1::Int) .*. True .*. emptyTIP
--- TIP (HCons (MyVal 20) (HCons 1 (HCons True HNil)))
 
--- Update the Int component of tip1 to 2. The Int component must
--- exist. Otherwise, it is a type error
-tip2 = ttip (2::Int) tip1
--- TIP (HCons (MyVal 20) (HCons 2 (HCons True HNil)))
 
--- Negate the boolean component of tip1
-tip3 = ttip not tip1
--- TIP (HCons (MyVal 20) (HCons 1 (HCons False HNil)))
+mainTIPTransform = describe "tipTransform" $ it "all" $ do
+  tip1 `shouldShowTo` "TIPH[MyVal 20,1,True]"
 
--- Update the Int component from the values of two other components
-tip4 = ttip (\(MyVal x) y -> x+y) tip1
--- TIP (HCons (MyVal 20) (HCons 21 (HCons True HNil)))
+  -- Update the Int component of tip1 to 2. The Int component must
+  -- exist. Otherwise, it is a type error
+  ttip (2::Int) tip1 `shouldShowTo`
+        "TIPH[MyVal 20,2,True]"
 
--- Update the MyVal component from the values of three other components
-tip5 = ttip (\b (MyVal x) y -> MyVal $ if b then x+y else 0) tip1
--- TIP (HCons (MyVal 21) (HCons 1 (HCons True HNil)))
+  -- Negate the boolean component of tip1
+  ttip not tip1 `shouldShowTo`
+        "TIPH[MyVal 20,1,False]"
 
--- The same but with the permuted argument order.
--- The order of arguments is immaterial: the values will be looked up using
--- their types
-tip5' = ttip (\b y (MyVal x)-> MyVal $ if b then x+y else 0) tip1
--- TIP (HCons (MyVal 21) (HCons 1 (HCons True HNil)))
+  -- Update the Int component from the values of two other components
+  ttip (\(MyVal x) y -> x+y) tip1 `shouldShowTo`
+    "TIPH[MyVal 20,21,True]"
+
+  -- Update the MyVal component from the values of three other components
+  ttip (\b (MyVal x) y -> MyVal $ if b then x+y else 0) tip1
+        `shouldShowTo`
+        "TIPH[MyVal 21,1,True]"
+
+  -- The same but with the permuted argument order.
+  -- The order of arguments is immaterial: the values will be looked up using
+  -- their types
+  ttip (\b y (MyVal x)-> MyVal $ if b then x+y else 0) tip1
+        `shouldShowTo`
+        "TIPH[MyVal 21,1,True]"
 
 -- The implementation
 -- part of HList proper now
-
-
-main = mapM_ putStrLn [show tip1, show tip2, show tip3, show tip4,
-		       show tip5, show tip5']

@@ -24,11 +24,15 @@
 -- This is the monadic version of TIPTransform.hs in the present directory.
 
 
-module TIPTransformM where
+module HListExample.TIPTransformM where
 
 import Data.HList.CommonMain
 import Data.Typeable
 import Control.Monad.Identity
+import Control.Monad.Writer
+
+import Test.Hspec
+import Properties.Common
 
 -- We start with the examples
 
@@ -89,6 +93,14 @@ op6 (MyVal x) b = do
 -- TIP (HCons (MyVal 5) (HCons 1 (HCons True (HCons 3.5 HNil))))
 
 
+op6w :: MyVal -> Bool -> Writer String MyVal
+op6w (MyVal x) b = do
+                let m = if b then MyVal (x `div` 4) else MyVal (x * 4)
+                tell ("MyVal is now " ++ show m)
+                            -- ==>> MyVal 5
+                return m
+
+
 {-  -- !Simple
 -- The Simple implementation
 -- The drawback is the need to let the type checker know the monad in which the
@@ -120,11 +132,13 @@ instance (Monad m, HOccurs arg db, TransTIPM m op db)
 -- Moved to TIP.hs
 -- -} -- !TF
 
-main :: IO ()
-main = do
-            mapM_ putStrLn [show tip1, show tip2, show tip3, show tip4,
-                    show tip5, show tip5']
-            tip2 <- tip6
-            putStrLn $ "tip2 is" ++ show tip2
-            return ()
+mainTTIPM = describe "ttipM" $ it "all" $ do
+  tip1 `shouldShowTo` "TIPH[MyVal 20,1,True,3.5]"
+  tip2 `shouldShowTo` "TIPH[MyVal 20,2,True,3.5]"
+  tip3 `shouldShowTo` "TIPH[MyVal 20,1,False,3.5]"
+  tip4 `shouldShowTo` "TIPH[MyVal 20,21,True,3.5]"
+  tip5 `shouldShowTo` "TIPH[MyVal 21,1,True,3.5]"
+  let tip6w = runWriter (ttipM op6w tip1)
+  fst tip6w `shouldShowTo` "TIPH[MyVal 5,1,True,3.5]"
+  snd tip6w `shouldBe` "MyVal is now MyVal 5"
 

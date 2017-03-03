@@ -31,7 +31,7 @@ happens to have the field names PtX.
 
 -}
 
-module Main where
+module HListExample.MainPatternMatch where
 
 import Data.HList.CommonMain
 

@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE TypeFamilies #-}
@@ -10,6 +11,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE ConstraintKinds #-}
 module Properties.Common where
 
 import Data.HList.CommonMain
@@ -17,10 +19,19 @@ import Test.QuickCheck
 import Data.Array.Unboxed
 import Data.HList.Variant
 import Data.Monoid
+import Data.Semigroup
 import Control.Lens
 import Control.Applicative
 import GHC.TypeLits (Symbol)
 import Language.Haskell.TH
+
+#if MIN_VERSION_hspec_expectations(0,8,0)
+import Test.Hspec.Expectations (shouldBe, shouldReturn, Expectation, HasCallStack)
+#else
+import Test.Hspec.Expectations (shouldBe, shouldReturn, Expectation)
+import GHC.Exts (Constraint)
+type HasCallStack = (() :: Constraint)
+#endif
 
 hListT :: [TypeQ] -> TypeQ
 hListT = foldr (\a b -> [t| $a ': $b |]) promotedNilT
@@ -50,6 +61,15 @@ instance (bb ~ (b, b), b ~ b') => ApplyAB (BinF b') bb b where
 eq :: (Show a, Show b, HCast a b, HCast b a, Eq a, Eq b) => a -> b -> Property
 eq x y = hCast x === Just y .&&. Just x === hCast y
 infix 4 `eq`
+
+
+shouldShowTo :: (HasCallStack, Show a) => a -> String -> Expectation
+shouldShowTo x y = show x `shouldBe` y
+infixr 0 `shouldShowTo`
+
+shouldReturnShowTo :: (HasCallStack, Show a) => IO a -> String -> Expectation
+shouldReturnShowTo x y = fmap show x `shouldReturn` y
+infixr 0 `shouldReturnShowTo`
 
 data HSuccF = HSuccF
 
@@ -127,8 +147,12 @@ instance Monoid (BoolN n) where
     mempty = BoolN (getAll mempty)
     mappend (BoolN x) (BoolN y) = BoolN (getAll (mappend (All x) (All y)))
 
+instance Semigroup (BoolN n)
+
+#if !MIN_VERSION_QuickCheck(2,9,0)
 instance Arbitrary (Identity (BoolN n)) where
     arbitrary = fmap return arbitrary
+#endif
 
 
 data HSortF = HSortF

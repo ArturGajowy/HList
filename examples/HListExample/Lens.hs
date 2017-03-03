@@ -4,9 +4,10 @@
 {- | Demonstrates @hLens@. See also labelable.hs which is more "convenient"
 
 -}
-module Main where
+module HListExample.Lens where
 import Data.HList.CommonMain
 import Control.Lens
+import Hspec
 
 makeLabels6 (words "x y z")
 
@@ -32,14 +33,12 @@ x' a = hLens x a
 y' a = hLens y a
 
 main = do
-    print (view (hLens x) r)
-    print (set (hLens x) () r)
+    view (hLens x) r `shouldBe` "\"hi\""
+    set (hLens x) () r `shouldBe` "Record{x=(),y=Record{y=321,x=123}}"
 
-    print (r ^. hLens y . hLens x)
-    print (r & hLens y . hLens y .~ "xy")
+    r ^. hLens y . hLens x `shouldBe` "123"
+    r & hLens y . hLens y .~ "xy" `shouldBe` "Record{x=\"hi\",y=Record{y=\"xy\",x=123}}"
 
-
-    putStrLn "\n\nand repeat:"
 
     -- and now for with hLens applied second
     print (view x' r)
@@ -55,6 +54,7 @@ main = do
               & unlabeled' . from tipHList %~ ttip (\x z -> x ++ show (z :: ())))
 
     r ^. unlabeled . from tipHList & tipPutStrLn
+    return ()
 
 
 tipPutStrLn tip = ttipM ?? tip $ \x -> do

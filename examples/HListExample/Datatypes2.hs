@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 
-module Datatypes2 where
+module HListExample.Datatypes2 where
 
 import Data.Typeable
 

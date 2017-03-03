@@ -7,7 +7,7 @@
 
 -}
 
-module MainGhcGeneric2 where
+module HListExample.MainGhcGeneric2 where
 
 import Data.HList
 

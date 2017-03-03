@@ -6,8 +6,11 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE ViewPatterns #-}
 -- more examples for record puns
-module Main where
+module HListExample.Pun where
 import Data.HList.CommonMain
+
+import Test.Hspec
+import Properties.Common
 
 makeLabels6 (words "a b c")
 
@@ -35,14 +38,14 @@ e2 = let c = 1; y = "hi" in [pun| r @ { c y } |]
 e3 = let x = 1; y = "hi" in [pun| r { x y } |]
 
 
-main = do
-        putStrLn "similar:"
-        print $ p1 r
-        print $ p2 r
-        print $ p4 r
+mainPun = describe "pun quasiquoter" $ do
+  it "pattern" $ do
+        p1 r `shouldShowTo` "(3,Record{a=3})"
+        p2 r `shouldShowTo` "(3,Record{a=3})"
+        p4 r `shouldBe` 3
 
-        putStrLn "\nexpression QQ:"
-        print $ e1
-        print $ e2
-        print $ e3
+  it "expression" $ do
+        e1 `shouldShowTo` "Record{r=Record{x=1,y=\"hi\",c=\"c\",b=Record{a=3}}}"
+        e2 `shouldShowTo` "Record{r=Record{c=1,y=\"hi\",b=Record{a=3}}}"
+        e3 `shouldShowTo` "Record{r=Record{x=1,y=\"hi\"}}"
 

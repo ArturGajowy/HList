@@ -1,9 +1,0 @@
-similar:
-(3,Record{a=3})
-(3,Record{a=3})
-3
-
-expression QQ:
-Record{r=Record{x=1,y="hi",c="c",b=Record{a=3}}}
-Record{r=Record{c=1,y="hi",b=Record{a=3}}}
-Record{r=Record{x=1,y="hi"}}

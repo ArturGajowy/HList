@@ -20,6 +20,7 @@ module Properties.LengthDependent where
 import Data.HList.HSort (hMSortBy)
 import Data.HList.Variant (eqVariant)
 import Data.HList.Record (hZipRecord2)
+import Data.HList.HList (hAppend')
 import Data.HList.CommonMain
 
 
@@ -111,6 +112,7 @@ hl1 n1 = [| do
         x <- genHL True
         y <- genHL True
         return $ conjoin [$(varE 'hConcat) ($(varE 'hBuild) x y) == hAppend x y,
+                          $(varE 'hConcat) ($(varE 'hBuild) x y) == hAppend' x y,
                           $(varE 'hConcat) (hBuild x) == x]
 
   it "partition" $
@@ -366,9 +368,14 @@ hl1 n1 = [| do
     z <- genHL (BoolN True :: BoolN "z")
     let xyz = hConcat (hBuild x y z)
         hxyz = hEnd (hBuild (hHead x) (hHead y) (hHead z))
-        hM v = hOccursMany xyz === hList2List v
+
+        -- -XNoMonoLocalBinds on ghc <= 7.10.4 allowed
+        -- having one function
+        hM1 v = hOccursMany xyz === hList2List v
+        hM2 v = hOccursMany xyz === hList2List v
+        hM3 v = hOccursMany xyz === hList2List v
     return $ conjoin
-      [ hM x, hM y, hM z,
+      [ hM1 x, hM2 y, hM3 z,
         hOccurs (hConcat (hBuild x (HCons w HNil) z)) === w,
         hOccursOpt xyz === (Nothing `asTypeOf` Just w)
         -- hProject hxyz === hBuild (hHead x) (hHead y)

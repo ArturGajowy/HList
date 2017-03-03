@@ -21,7 +21,7 @@ Ralf
 
 -}
 
-module Main where
+module HListExample.MainPosting040607 where
 
 import Data.HList.CommonMain
 import Data.Typeable

@@ -5,6 +5,7 @@
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE MonoLocalBinds #-} -- maybe it isn't necessary for everything?
 module Properties.LengthDependentSplice where
 import Properties.LengthDependent
 import Language.Haskell.TH
@@ -21,6 +22,6 @@ hl1_2_3 = $(doE $
     ++ [ noBindS [| describe $(stringE (show (n1,n2,n3))) $(hl3 n1 n2 n3) |]
       | n1 <- [0 .. 2],
         n2 <- [0 .. 1],
-        n3 <- [0 .. 2],
+        n3 <- [0 .. 1],
         not $ all (==0) [n1,n2,n3] ]
   )
