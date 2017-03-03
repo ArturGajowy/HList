@@ -153,13 +153,28 @@ ambiguity as to which field \"a\" should actually be updated.
 
 -}
 tipyLens f (TIP s) =
-      case hSplitAt (getN s f) s of
-          (x, Tagged a `HCons` ys) ->
+      case hSplitAt (getN s f) (ghc8fix1 s) of
+          (x, ta @ (Tagged a) `HCons` ys)
+             | () <- ghc8fix2 ta ->
               let mkt b = mkTIP (x `hAppendList` (tagSelf b `HCons` ys))
               in mkt <$> f a
   where
     getN :: HFind (Label a) (LabelsOf s) n => HList s -> (a -> f b) -> Proxy n
     getN _ _ = Proxy
+
+    -- without these, tipyLens has a type that has kind variables,
+    -- (that end up being * when an actual TIP is provided), leading to
+    -- a Properties.LengthIndependent compile error:
+    -- .../.stack-work/dist/x86_64-linux/Cabal-1.24.2.0/build/Data/HList/TIP.hi
+    -- Declaration for tipyLens:
+    --   Iface type variable out of scope:  k
+    -- Cannot continue after interface file error
+    ghc8fix1 :: HList (Tagged x x ': xs) -> HList (Tagged x x ': xs)
+    ghc8fix1 = id
+
+    ghc8fix2 :: Tagged a a -> ()
+    ghc8fix2 _ = ()
+
 
 
 -- | The same as 'tipyProject', except also return the
