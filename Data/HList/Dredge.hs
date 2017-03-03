@@ -242,7 +242,17 @@ Just 'r'
 hLookupByLabelPath :: HasFieldPath False ls r v => Label ls -> r -> v
 hLookupByLabelPath labels r = hLookupByLabelPath1 hFalse labels r
 
-class LabelablePath (xs :: [*]) apb spt where
+{- |
+
+> hLens'Path labc == hLens' la . hLens' lb . hLens' lc
+>  where
+>       la :: Label "a"
+>       lb :: Label "b"
+>       lc :: Label "c"
+>       labc :: Label '["a", "b", "c"]
+
+-}
+class LabelablePath (xs :: [*]) apb spt | spt xs -> apb where
     hLens'Path :: Label xs -> apb -> spt
 
 instance (Labelable x r s t a b,
@@ -322,6 +332,33 @@ class FieldTree (r :: *) (v :: [[*]]) | r -> v
 instance (TryCollectionList r ns, MapFieldTree ns vs) => FieldTree r vs
 
 
+#if (__GLASGOW_HASKELL__ >= 800)
+-- possibly https://ghc.haskell.org/trac/ghc/ticket/13284
+-- dredge' x = (isSimple . dredge) x
+--     • Overlapping instances for TryCollectionList r0 ns0
+--         arising from a use of ‘dredge’
+--       Matching instances:
+--         instance [overlappable] nothing ~ 'Nothing =>
+--                                 TryCollectionList x nothing
+--           -- Defined at /home/aavogt/wip/HList/HList/Data/HList/Dredge.hs:340:31
+--         ...plus four instances involving out-of-scope types
+--         (use -fprint-potential-instances to see them all)
+--       (The choice depends on the instantiation of ‘r0, ns0’
+--        To pick the first instance above, use IncoherentInstances
+--        when compiling the other instance declarations)
+--
+-- attempt to resolve that with a closed type family
+
+type family TryCollectionListTF (r :: *) :: Maybe [*] where
+  TryCollectionListTF (Record r) = Just r
+  TryCollectionListTF (Variant r) = Just r
+  TryCollectionListTF (TIC r) = Just r
+  TryCollectionListTF (TIP r) = Just r
+  TryCollectionListTF nothing = Nothing
+
+type TryCollectionList r v = (v ~ TryCollectionListTF r)
+
+#else
 -- | try to extract the list applied to the Record or Variant
 class TryCollectionList (r :: *) (v :: Maybe [*]) | r -> v
 
@@ -330,6 +367,7 @@ instance {-# OVERLAPPING  #-} TryCollectionList (Record  r) (Just r)
 instance {-# OVERLAPPING  #-} TryCollectionList (Variant r) (Just r)
 instance {-# OVERLAPPING  #-} TryCollectionList (TIC r) (Just r)
 instance {-# OVERLAPPING  #-} TryCollectionList (TIP r) (Just r)
+#endif
 
 class MapFieldTree (ns :: Maybe [*]) (vs :: [[*]]) | ns -> vs
 
