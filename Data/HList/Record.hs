@@ -466,7 +466,15 @@ instance (Read v, ShowLabel l,
 instance (HMapCxt HList ReadComponent (AddProxy rs) bs,
           ApplyAB ReadComponent (Proxy r) readP_r,
           HProxies rs,
-          HSequence ReadP (readP_r ': bs) (r ': rs)) => Read (Record (r ': rs)) where
+          HSequence ReadP (readP_r ': bs) (r ': rs),
+
+          -- ghc-8.0.2 needs these. The above constraints
+          -- should imply them
+          r ~ Tagged l v,
+          ShowLabel l,
+          Read v,
+          HSequence ReadP bs rs
+          ) => Read (Record (r ': rs)) where
     readsPrec _ = readP_to_S $ do
         _ <- string "Record{"
         content <- hSequence parsers
