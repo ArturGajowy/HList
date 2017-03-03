@@ -706,7 +706,7 @@ class Fail (x :: k)
 type ErrText x = GHC.TypeLits.Text x
 type ErrShowType x = GHC.TypeLits.ShowType x
 
--- XXX this should be different
+-- type Fail = TypeError -- another option
 instance TypeError x => Fail x
 #else
 
