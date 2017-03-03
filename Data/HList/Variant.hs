@@ -27,7 +27,6 @@ import Data.HList.HArray
 import Text.ParserCombinators.ReadP hiding (optional)
 
 import Unsafe.Coerce
-import GHC.Prim (Any)
 import GHC.Exts (Constraint)
 
 import Data.Data

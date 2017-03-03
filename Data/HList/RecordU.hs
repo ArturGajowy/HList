@@ -16,7 +16,6 @@ import LensDefs
 import Data.HList.Labelable
 
 import Unsafe.Coerce
-import GHC.Exts (Any)
 
 -- * Type definitions
 -- ** RecordUS

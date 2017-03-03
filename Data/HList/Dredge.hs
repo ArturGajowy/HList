@@ -14,7 +14,6 @@ import Data.HList.TIP
 import Data.HList.TIC
 import Data.HList.FakePrelude
 import Data.HList.Labelable
-import GHC.Exts
 import LensDefs (isSimple)
 import Data.HList.TypeEqO () -- if this is missing, dredge fails
 

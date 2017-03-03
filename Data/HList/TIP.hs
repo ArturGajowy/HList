@@ -20,7 +20,6 @@ import Data.HList.FakePrelude
 import Data.HList.HList
 import Data.HList.Record
 import Data.HList.HTypeIndexed ()
-import Data.HList.HOccurs
 import Data.HList.TIPtuple
 import Data.List (intercalate)
 import Data.Array (Ix)
