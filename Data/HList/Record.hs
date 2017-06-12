@@ -1245,13 +1245,11 @@ instance (HZipRecord x y xy, SameLengths [x,y,xy])
     hUnzip = hUnzipRecord
 
 
-instance (RecordValuesR lvs ~ vs,
-          SameLabels ls lvs,
-          LabelsOf lvs ~ ls,
-          SameLengths [ls,vs,lvs],
-          HAllTaggedLV lvs)
-    => HUnzip Proxy ls vs lvs where
+instance (lv ~ Tagged l v, HUnzip Proxy ls vs lvs)
+    => HUnzip Proxy (l ': ls) (v ': vs) (lv ': lvs) where
     hUnzip _ = (Proxy, Proxy)
+
+instance HUnzip Proxy '[] '[] '[] where hUnzip _ = (Proxy, Proxy)
 
 instance HUnzip Proxy ls vs lvs
       => HZip Proxy ls vs lvs where
