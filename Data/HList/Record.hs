@@ -1245,8 +1245,21 @@ instance (HZipRecord x y xy, SameLengths [x,y,xy])
     hUnzip = hUnzipRecord
 
 
-instance (lv ~ Tagged l v, HUnzip Proxy ls vs lvs)
-    => HUnzip Proxy (l ': ls) (v ': vs) (lv ': lvs) where
+-- | MapLabel is involved so that we can have:
+--
+-- > zip ls vs :: Proxy lvs
+-- >  where
+-- >   ls :: Proxy '[Label (Lbl i j), Label "x"]
+-- >   vs :: Proxy '[t1, t2]
+-- >   lvs =  '[Tagged (Lbl i j) t1, Tagged "x" t2]
+--
+-- >   -- or we could have
+-- >   ls :: Proxy '["w", "x"]
+-- >   -- vs :: as above
+-- >   lvs :: '[Tagged "w" t1, Tagged "x" t2]
+instance (MapLabel '[labell] ~ '[Label l],
+          lv ~ Tagged l v, HUnzip Proxy ls vs lvs)
+    => HUnzip Proxy (labell ': ls) (v ': vs) (lv ': lvs) where
     hUnzip _ = (Proxy, Proxy)
 
 instance HUnzip Proxy '[] '[] '[] where hUnzip _ = (Proxy, Proxy)
