@@ -17,6 +17,14 @@ import Data.HList.Labelable
 import LensDefs (isSimple)
 import Data.HList.TypeEqO () -- if this is missing, dredge fails
 
+
+#if (__GLASGOW_HASKELL__ == 800)
+-- https://ghc.haskell.org/trac/ghc/ticket/13371
+toLabelx x = toLabelSym x
+#else
+toLabelx x = toLabel x
+#endif
+
 {- |
 
 Using HListPP syntax for short hand, @dredge `foo@ expands out to
@@ -63,23 +71,8 @@ as explained in the 'Labelable' instances, only simple optics
 works better if the target is a TIP or TIC
 
 -}
-dredge
-  :: forall (vs :: [*]) (ns :: [[*]]) (ns1 :: [[*]]) (vs1 :: [*]) (ns2 :: [[*]]) (xs :: [*]) (l :: k) r (rft :: k1) v (p :: *
-                                                                                                                                     -> k1
-                                                                                                                                     -> *) (fb :: k1) x.
-     (MapFieldTree (TryCollectionListTF r) ns,
-      LabelablePath xs (p v fb) (p r rft), SameLength' ns vs,
-      SameLength' ns1 vs1, SameLength' vs ns, SameLength' vs1 ns1,
-      MapFieldTreeVal r (TryCollectionListTF r) vs,
-      FilterLastEq (Label l) ns ns ns1, FilterLastEq (Label l) ns vs vs1,
-      FilterVEq1 v vs1 ns1 ns2,
-      HGuardNonNull (NamesDontMatch r ns l) ns1,
-      HSingleton (NonUnique r v l) (TypesDontMatch r ns1 vs1 v) ns2 xs,
-      EnsureLabel x (Label l)) =>
-     x -> p v fb -> p r rft
-     -- type signature is a workaround for: https://ghc.haskell.org/trac/ghc/ticket/13371
 dredge label = getSAfromOutputOptic $ \ pr pa ->
-      hLens'Path (labelPathEndingWithTD pr (toLabel label) pa)
+      hLens'Path (labelPathEndingWithTD pr (toLabelx label) pa)
 
 
 
@@ -96,18 +89,8 @@ dredge' label = isSimple (dredge label)
 -- result type (@a@) is not used when the label would otherwise
 -- be ambiguous. dredgeND might give better type errors, but otherwise
 -- there should be no reason to pick it over dredge
-dredgeND
-  :: forall (ns :: [[*]]) (ns' :: [[*]]) (xs :: [*]) (l :: k) r (rft :: k1) a (p :: *
-                                                                                             -> k1
-                                                                                             -> *) (fb :: k1) x.
-     (LabelablePath xs (p a fb) (p r rft),
-      MapFieldTree (TryCollectionListTF r) ns,
-      FilterLastEq (Label l) ns ns ns',
-      HSingleton (NonUnique' r l) (NamesDontMatch r ns l) ns' xs,
-      EnsureLabel x (Label l)) =>
-     x -> p a fb -> p r rft
 dredgeND label = getSAfromOutputOptic $ \ pr _a ->
-      hLens'Path (labelPathEndingWith pr (toLabel label))
+      hLens'Path (labelPathEndingWith pr (toLabelx label))
 
 
 -- | 'dredgeND' except a simple (s ~ t, a ~ b) optic is produced

@@ -33,7 +33,7 @@ module Data.HList.Labelable
     LabeledCxt1,
     LabeledTo(LabeledTo),
     LabeledR(LabeledR),
-    ToSym, EnsureLabel(toLabel),
+    ToSym, EnsureLabel(toLabel), toLabelSym,
     Identity,
     LabelableTIPCxt,
     LabeledOpticType(..),
@@ -211,6 +211,9 @@ instance EnsureLabel (Proxy x) (Label (x :: k)) where
 instance ToSym (a b c) (x :: Symbol) => EnsureLabel (a b c) (Label x) where
   toLabel _ = Label
 
+
+-- | fix the `k` kind variable to 'Symbol'
+toLabelSym label = toLabel label `asTypeOf` (Label :: Label (x :: Symbol))
 
 
 {- $comparisonWithhLensFunction
