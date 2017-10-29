@@ -36,7 +36,9 @@ dcl n = let
     d = make_dname n
 
     dd =
-#if MIN_VERSION_template_haskell(2,11,0)
+#if MIN_VERSION_template_haskell(2,12,0)
+      dataD (return []) c [] Nothing [] [derivClause Nothing [ [t| Typeable |] ]]
+#elif MIN_VERSION_template_haskell(2,11,0)
       dataD (return []) c [] Nothing [] (fmap (:[]) [t| Typeable |])
 #else
       dataD (return []) c [] [] [''Typeable]
