@@ -76,9 +76,9 @@ dredge label = getSAfromOutputOptic $ \ pr pa ->
 
 
 
-getSAfromOutputOptic :: forall a fb rft p rs stab. (p a fb -> p rs rft) ~ stab 
-                => (Proxy rs -> Proxy a -> stab) -> stab
-getSAfromOutputOptic f = f (Proxy :: Proxy s) (Proxy :: Proxy a)
+getSAfromOutputOptic :: (p a fb -> p rs rft) ~ stab
+                => (Proxy (rs :: *) -> Proxy (a :: *) -> stab) -> stab
+getSAfromOutputOptic f = f Proxy Proxy
 
 
 -- | 'dredge' except a simple (s ~ t, a ~ b) optic is produced
