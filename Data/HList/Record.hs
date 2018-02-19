@@ -840,6 +840,8 @@ instance H2ProjectByLabels ls1 r rin rout =>
     h2projectByLabels' _ _ (HCons x r) = (HCons x rin, rout)
         where (rin,rout) = h2projectByLabels (Proxy::Proxy ls1) r
 
+-- | if ls above has labels not in the record,
+-- we get labels (rin `isSubsetOf` ls).
 instance H2ProjectByLabels ls r rin rout =>
     H2ProjectByLabels' 'Nothing ls (f ': r) rin (f ': rout) where
     h2projectByLabels' _ ls (HCons x r) = (rin, HCons x rout)
