@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 
 {- |
    The HList library
@@ -92,5 +93,45 @@ class SameLengths [x,y,xy] => HUnzip (r :: [*] -> *) x y xy
 -- | 'zip'. Variant supports hUnzip, but not hZip ('hZipVariant' returns a Maybe)
 class HUnzip r x y xy => HZip (r :: [*] -> *) x y xy where
   hZip :: r x -> r y -> r xy
+
+#if __GLASGOW_HASKELL__ != 706
+instance (lv ~ Tagged l v, HUnzip Proxy ls vs lvs)
+    => HUnzip Proxy (Label l ': ls) (v ': vs) (lv ': lvs) where
+    hUnzip _ = (Proxy, Proxy)
+
+instance HUnzip Proxy '[] '[] '[] where hUnzip _ = (Proxy, Proxy)
+
+
+{- | Missing from GHC-7.6.3 due to a bug:
+
+> let r = hEnd $ hBuild 1 2 3
+> *Data.HList> hZipList r r
+> H[(1,1),(2,2),(3,3)]
+> *Data.HList> hZip r r
+>
+> <interactive>:30:1:
+>     Couldn't match type `Label k l' with `Integer'
+>     When using functional dependencies to combine
+>       HUnzip
+>         (Proxy [*]) ((':) * (Label k l) ls) ((':) * v vs) ((':) * lv lvs),
+>         arising from the dependency `xy -> x y'
+>         in the instance declaration at Data/HList/HListPrelude.hs:96:10
+>       HUnzip
+>         HList
+>         ((':) * Integer ((':) * Integer ((':) * Integer ('[] *))))
+>         ((':) * Integer ((':) * Integer ((':) * Integer ('[] *))))
+>         ((':)
+>            *
+>            (Integer, Integer)
+>            ((':) * (Integer, Integer) ((':) * (Integer, Integer) ('[] *)))),
+>         arising from a use of `hZip' at <interactive>:30:1-4
+>     In the expression: hZip r r
+>     In an equation for `it': it = hZip r r
+
+-}
+instance HUnzip Proxy ls vs lvs
+      => HZip Proxy ls vs lvs where
+  hZip _ _ = Proxy
+#endif
 
 

@@ -1,4 +1,4 @@
-
+{-# LANGUAGE CPP #-}
 {- |
    The HList library
 
@@ -150,7 +150,9 @@ module Data.HList.Record
     -- * Unclassified
 
     -- | Probably internals, that may not be useful
+#if __GLASGOW_HASKELL__ != 706
     zipTagged,
+#endif
     HasField'(..),
     DemoteMaybe,
     HasFieldM1(..),
@@ -1247,31 +1249,11 @@ instance (HZipRecord x y xy, SameLengths [x,y,xy])
     hUnzip = hUnzipRecord
 
 
--- | MapLabel is involved so that we can have:
---
--- > zip ls vs :: Proxy lvs
--- >  where
--- >   ls :: Proxy '[Label (Lbl i j), Label "x"]
--- >   vs :: Proxy '[t1, t2]
--- >   lvs =  '[Tagged (Lbl i j) t1, Tagged "x" t2]
---
--- >   -- or we could have
--- >   ls :: Proxy '["w", "x"]
--- >   -- vs :: as above
--- >   lvs :: '[Tagged "w" t1, Tagged "x" t2]
-instance (MapLabel '[labell] ~ '[Label l],
-          lv ~ Tagged l v, HUnzip Proxy ls vs lvs)
-    => HUnzip Proxy (labell ': ls) (v ': vs) (lv ': lvs) where
-    hUnzip _ = (Proxy, Proxy)
+#if __GLASGOW_HASKELL__ != 706
+{- | Missing from ghc-7.6, because HZip Proxy instances interfere with HZip
+HList instances.
 
-instance HUnzip Proxy '[] '[] '[] where hUnzip _ = (Proxy, Proxy)
-
-instance HUnzip Proxy ls vs lvs
-      => HZip Proxy ls vs lvs where
-  hZip _ _ = Proxy
-
-
-{- | a variation on 'hZip' for 'Proxy', where
+a variation on 'hZip' for 'Proxy', where
 the list of labels does not have to include Label
 (as in @ts'@)
 
@@ -1299,6 +1281,7 @@ zipTagged :: (MapLabel ts ~ lts,
               HZip Proxy lts vs tvs)
       => Proxy ts -> proxy vs -> Proxy tvs
 zipTagged _ _ = Proxy
+#endif
 
 
 
