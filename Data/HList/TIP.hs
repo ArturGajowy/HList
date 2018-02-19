@@ -263,7 +263,7 @@ type TagUntag xs = TagUntagFD xs (TagR xs)
 -- | Sometimes the type variables available have @TagR@ already applied
 -- (ie the lists have elements like @Tagged X X@). Then this abbreviation
 -- is useful:
-type UntagTag xs = TagUntagFD (UntagR xs) xs
+type UntagTag xs = (TagR (UntagR xs) ~ xs, TagUntagFD (UntagR xs) xs)
 
 type family TagR (a :: [*]) :: [*]
 type family UntagR (ta :: [*]) :: [*]
