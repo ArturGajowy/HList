@@ -8,12 +8,17 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE CPP #-}
 module Properties.LengthIndependent where
 import Properties.Common
 import Control.Lens
 import Data.HList.CommonMain
 import Test.Hspec
+#if MIN_VERSION_QuickCheck(2,10,1)
+import Test.QuickCheck hiding (Fun)
+#else
 import Test.QuickCheck
+#endif
 import Data.Monoid
 import Data.Maybe
 import Control.Applicative
