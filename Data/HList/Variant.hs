@@ -932,7 +932,6 @@ instance (Unvariant '[Tagged t x] x, Monoid x) => Monoid (Variant '[Tagged t x])
                     (l, r) -> mkVariant (Label :: Label t) (mappend l r) Proxy
 
 
--- | XXX check this mappend is legal
 instance (Monoid x, Monoid (Variant (a ': b))) => Monoid (Variant (Tagged t x ': a ': b)) where
     mempty = extendVariant mempty
     mappend a b = case (splitVariant1 a, splitVariant1 b) of

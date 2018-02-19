@@ -49,7 +49,6 @@ makeLabels6 (words "optA optB optC")
 makeLabelable "abc df"
 
 #if USE_LABEL3
--- XXX remove extra Label?
 v = (optA .*. optB .*. optC .*. emptyProxy)
       `zipTagged` (Proxy :: Proxy '[Int,Char,Double])
 #else
