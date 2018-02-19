@@ -29,6 +29,7 @@ import Text.ParserCombinators.ReadP hiding (optional)
 import Unsafe.Coerce
 import GHC.Exts (Constraint)
 
+import Data.Semigroup (Semigroup( .. ))
 import Data.Data
 import Control.Applicative
 import LensDefs
@@ -912,6 +913,17 @@ instance Enum x => Enum (Variant '[Tagged s x]) where
 
 -- * Ix (TODO)
 
+-- * Semigroup
+instance (Unvariant '[Tagged t x] x, Semigroup x) => Semigroup (Variant '[Tagged t x]) where
+    a <> b = case (unvariant a, unvariant b) of
+                    (l, r) -> mkVariant (Label :: Label t) (l <> r) Proxy
+
+instance (Semigroup x, Semigroup (Variant (a ': b))) => Semigroup (Variant (Tagged t x ': a ': b)) where
+    a <> b = case (splitVariant1 a, splitVariant1 b) of
+                    (Left l, Left r) -> mkVariant (Label :: Label t) (l <> r) Proxy
+                    (Left l, _) -> mkVariant (Label :: Label t) l Proxy
+                    (_, Left r) -> mkVariant (Label :: Label t) r Proxy
+                    (Right l, Right r) -> extendVariant $ l <> r
 
 -- * Monoid
 instance (Unvariant '[Tagged t x] x, Monoid x) => Monoid (Variant '[Tagged t x]) where

@@ -147,7 +147,7 @@ instance Monoid (BoolN n) where
     mempty = BoolN (getAll mempty)
     mappend (BoolN x) (BoolN y) = BoolN (getAll (mappend (All x) (All y)))
 
-instance Semigroup (BoolN n)
+instance Semigroup (BoolN n) where (<>) = mappend
 
 #if !MIN_VERSION_QuickCheck(2,9,0)
 instance Arbitrary (Identity (BoolN n)) where

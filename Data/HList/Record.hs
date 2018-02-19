@@ -196,6 +196,7 @@ import Text.ParserCombinators.ReadP
 import LensDefs
 
 import Data.Array (Ix)
+import Data.Semigroup (Semigroup)
 
 -- imports for doctest/examples
 import Data.HList.Label6 ()
@@ -246,6 +247,7 @@ l .=. v = newLVPair l v
 
 newtype Record (r :: [*]) = Record (HList r)
 
+deriving instance Semigroup (HList r) => Semigroup (Record r)
 deriving instance Monoid (HList r) => Monoid (Record r)
 deriving instance (Eq (HList r)) => Eq (Record r)
 deriving instance (Ord (HList r)) => Ord (Record r)

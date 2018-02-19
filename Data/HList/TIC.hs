@@ -24,6 +24,7 @@ import Data.HList.HList
 import Data.HList.HArray
 
 import Data.Array (Ix)
+import Data.Semigroup (Semigroup)
 
 import Text.ParserCombinators.ReadP
 import LensDefs
@@ -41,6 +42,7 @@ deriving instance Ix (Variant l) => Ix (TIC l)
 deriving instance Bounded (Variant l) => Bounded (TIC l)
 deriving instance Enum (Variant l) => Enum (TIC l)
 deriving instance Monoid (Variant l) => Monoid (TIC l)
+deriving instance Semigroup (Variant l) => Semigroup (TIC l)
 
 
 instance HMapAux Variant f xs ys => HMapAux TIC f xs ys where

@@ -23,6 +23,8 @@ import Data.HList.HTypeIndexed ()
 import Data.HList.TIPtuple
 import Data.List (intercalate)
 import Data.Array (Ix)
+import Data.Semigroup (Semigroup)
+
 
 import LensDefs
 
@@ -33,6 +35,7 @@ import LensDefs
 -- has type @Tagged e_i e_i@
 newtype TIP (l :: [*]) = TIP{unTIP:: HList l}
 
+deriving instance Semigroup (HList a) => Semigroup (TIP a)
 deriving instance Monoid (HList a) => Monoid (TIP a)
 deriving instance Eq (HList a) => Eq (TIP a)
 deriving instance (Ord (HList r)) => Ord (TIP r)

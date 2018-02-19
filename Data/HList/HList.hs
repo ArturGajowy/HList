@@ -18,6 +18,7 @@ import Data.List
 import LensDefs
 
 import Data.Array (Ix)
+import Data.Semigroup
 
 -- --------------------------------------------------------------------------
 -- * Heterogeneous type sequences
@@ -1630,6 +1631,10 @@ instance
             $ (hProxies :: HList (AddProxy a))
   mappend a b = hMap UncurryMappend $ hZip a b
 
+instance
+    (HZip HList a a aa,
+     HMapCxt HList UncurryMappend aa a) => Semigroup (HList a) where
+  a <> b = hMap UncurryMappend $ hZip a b
 
 -- ** helper functions
 
@@ -1641,4 +1646,7 @@ data UncurryMappend = UncurryMappend
 instance (aa ~ (a,a), Monoid a) => ApplyAB UncurryMappend aa a where
     applyAB _ = uncurry mappend
 
+data UncurrySappend = UncurrySappend
+instance (aa ~ (a,a), Semigroup a) => ApplyAB UncurrySappend aa a where
+    applyAB _ = uncurry (<>)
 

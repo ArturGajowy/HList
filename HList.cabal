@@ -57,6 +57,8 @@ library
   Build-Depends:       base >= 4.6 && < 4.10,
                        -- for Typeable '[] and '(:) with ghc-7.6
                        base-orphans,
+                       -- Data.Semigroup for ghc < 8
+                       semigroups,
                        template-haskell,
                        ghc-prim,
                        mtl,
