@@ -358,7 +358,12 @@ hl0 = describe "0 -- length independent"  $ do
     show v `shouldBe` "[V{x='a'},V{y=\"ly\"}]"
     read (show v) `shouldBe` v
 
+#if __GLASGOW_HASKELL__ != 802 && __GLASGOW_HASKELL__ != 804
+    -- ghc-8.2.1: typeIndexed' has: Couldn't match with  ‘*’ with ‘Symbol’
+    -- probably a ghc bug as it (1) works in other version (2) works after in-lining
     show (map (^. typeIndexed') v) `shouldBe` "[TIC{char='a'},TIC{[Char]=\"ly\"}]"
+#endif
+    show (map (^. simple . typeIndexed . simple) v) `shouldBe` "[TIC{char='a'},TIC{[Char]=\"ly\"}]"
 
   it "Data instances gread/gshow" $ do
     property $ do
