@@ -223,8 +223,9 @@ testRecords = describe "testRecords" $ it "tests" $ do
     `shouldShowTo` "Record{price=8.8,breed=Cow}"
 
   -- XXX extra Label shouldn't be needed?
-  hProjectByLabels (hEndP $ hBuild breed price) test4
-    `shouldShowTo` "Record{price=8.8,breed=Cow}"
+  -- alternatively it could be a compile-time error...
+  -- hProjectByLabels (hEndP $ hBuild breed price) test4
+  --  `shouldShowTo` "Record{price=8.8,breed=Cow}"
 
   -- test7 should be the same as test4 but
   -- with the different order of labels
