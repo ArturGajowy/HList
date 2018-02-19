@@ -103,7 +103,12 @@ mainCmdargs = describe "cmdargs/Data" $ do
     everywhere (mkT (succ :: Char -> Char)) d0 `shouldShowTo`
       "Record{x=5,y=True,z=V{optC=1.0},tic=TIC{char='y'}}"
 
-#if !(USE_LABEL3)
+#if __GLASGOW_HASKELL__ != 706
+  --  ghc-7.6.3 fails with all uses of dredge:
+  --     Kind incompatibility when matching types:
+  --    Const (Data.Monoid.First Double) Double :: AnyK
+  --    Const (Data.Monoid.First Double) Double :: *
+
   it "dredge optC" $
     d0 & dredge optC +~ 1 `shouldShowTo`
       "Record{x=5,y=True,z=V{optC=2.0},tic=TIC{char='x'}}"
