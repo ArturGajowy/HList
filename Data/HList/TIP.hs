@@ -26,6 +26,10 @@ import Data.Array (Ix)
 import Data.Semigroup (Semigroup)
 
 
+#if __GLASGOW_HASKELL__ > 710
+import Data.Coerce
+#endif
+
 import LensDefs
 
 -- --------------------------------------------------------------------------
@@ -294,6 +298,8 @@ tipRecord' x = isSimple tipRecord x
 -- --------------------------------------------------------------------------
 -- * Zip
 
+#if __GLASGOW_HASKELL__ < 800
+-- pre-coerce
 instance (HZipList (UntagR x) (UntagR y) (UntagR xy),
           UntagTag x, UntagTag y, UntagTag xy,
           SameLengths [x,y,xy],
@@ -311,6 +317,31 @@ instance (HZipList (UntagR x) (UntagR y) (UntagR xy),
           HTypeIndexed x, HTypeIndexed y,
           SameLengths [x,y,xy]) => HUnzip TIP x y xy where
   hUnzip = hUnzipTIP
+
+#else
+-- ghc-7.10.3 has coerce, but rejects these instances
+instance (HZipList xL yL xyL,
+          lty ~ (HList xyL -> (HList xL,HList yL)),
+          Coercible lty (TIP xy -> (TIP x, TIP y)),
+          UntagR x ~ xL, TagR xL ~ x, -- `TagR (UntagR x) ~ x` included by UntagTag
+          UntagR y ~ yL, TagR yL ~ y,
+          UntagR xy ~ xyL, TagR xyL ~ xy,
+          SameLengths '[x,y,xy],
+          UntagTag x, UntagTag y, UntagTag xy
+        ) => HUnzip TIP x y xy where
+  hUnzip = coerce (hUnzipList :: lty)
+
+instance (HUnzip TIP x y xy,
+          HZipList xL yL xyL,
+          lty ~ (HList xL -> HList yL -> HList xyL),
+          Coercible lty (TIP x -> TIP y -> TIP xy) ,
+          UntagR x ~ xL,
+          UntagR y ~ yL,
+          UntagR xy ~ xyL,
+          UntagTag x, UntagTag y, UntagTag xy
+        ) => HZip TIP x y xy where
+  hZip = coerce (hZipList :: lty)
+#endif
 
 -- | specialization of 'hZip'
 hZipTIP (TIP x) (TIP y) = TIP (hTagSelf (hZipList (hUntagSelf x) (hUntagSelf y)))
