@@ -38,8 +38,8 @@ Extra-Source-Files:
                      Data/HList/obsolete/*.hs
 
 Source-Repository head
-    type: darcs
-    location: http://code.haskell.org/HList
+    type: git
+    location: https://bitbucket.org/HList/hlist
 
 
 flag new_type_eq

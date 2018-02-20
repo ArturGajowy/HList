@@ -11,18 +11,19 @@ The HList library and samples
 
 Getting the code
 
-> darcs get http://code.haskell.org/HList
+> git clone https://bitbucket.org/HList/hlist HList
 
 ----------------------------------------------------------------------
 
 Pushing changes
 
-You need an account at code.haskell.org
+You need an account at bitbucket.org
 
 > cd HList
-> darcs pull user@code.haskell.org:/srv/darcs/HList
-> darcs record
-> darcs push
+> git clone git@bitbucket.org:HList/hlist.git
+> git pull
+> git commit --interactive
+> git push
 
 ----------------------------------------------------------------------
 
@@ -35,17 +36,18 @@ The code from the database section of the HList paper is not included
 since doing so would have implied inclusion of substantial packages,
 namely the underlying infrastructure for database access library.
 
-You can get HList from Hackage or from Darcs:
+You can get HList from Hackage or from bitbucket:
 
 $ cabal update && cabal install HList
 
 Or:
 
-$ darcs get --partial http://code.haskell.org/HList/
+$ git clone https://bitbucket.org/HList/hlist HList
 $ cd HList; cabal install
 
 The code works --- within the limits exercised in the source files ---
-for GHC-7.6 and GHC-7.8 and GHC-7.10. Older compilers are not supported.
+for GHC-7.6, 7.8, 7.10, 8.2 and 8.4.0.20180209.
+Older compilers are not supported.
 
 One may run "cabal test" to check the distribution.
 
