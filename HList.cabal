@@ -1,5 +1,5 @@
 Name:                HList
-Version:             0.5.0.0
+Version:             0.5.0.1
 Category:            Data
 Synopsis:            Heterogeneous lists
 Description:         HList provides many operations to create and manipulate
@@ -54,7 +54,7 @@ flag new_type_eq
                See <https://ghc.haskell.org/trac/ghc/ticket/9918>
 
 library
-  Build-Depends:       base >= 4.6 && < 4.12,
+  Build-Depends:       base >= 4.6 && < 4.15,
                        -- for Typeable '[] and '(:) with ghc-7.6
                        base-orphans,
                        -- Data.Semigroup for ghc < 8
